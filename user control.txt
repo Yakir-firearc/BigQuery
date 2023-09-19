@@ -1,0 +1,20 @@
+select 
+DATE_DIFF(CURRENT_DATE(), last_search_date,DAY) days_since_last_search
+,existing_sp
+,user_id
+,app_id
+,country
+,source
+,last_search_date
+,last_install
+,lds
+,lws
+,user_group
+from `data-processing-272107.dwh.vw_fact_users` u
+LEFT JOIN (SELECT suid, MAX(srch_ngn) existing_sp FROM `pc-windows-168009.report.search_log` WHERE date(_PARTITIONTIME) >= '2023-09-11' AND apl_id = '1628694616891331' GROUP BY 1) s on s.suid = u.user_id
+where EXISTS (select 1 FROM `mrr_dev.users_gifs_skenzo` g where g.suid = u.user_id)
+and app_id = '1628694616891331'
+-- and install_date >= '2022-01-01'
+-- and last_install = FALSE
+ ORDER BY 2 DESC
+ ,1 desc
